@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wedding Shoot Itinerary Maker — Marco Wang Photography</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700&family=Lora:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azzurro: #C2663A;
+    --azzurro-deep: #A8532D;
+    --azzurro-light: #FDF0EA;
+    --rosso: #CE2B37;
+    --rosso-soft: #FFF0F0;
+    --verde: #008C45;
+    --verde-soft: #EEFAF3;
+    --bianco: #FFFFFF;
+    --nero: #1A1A1A;
+    --grigio: #6B7280;
+    --grigio-light: #F3F4F6;
+    --bg: #FAFBFC;
+    --border: #E5E7EB;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Lora', serif;
+    background: var(--bg);
+    color: var(--nero);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .flag-bar { display: flex; height: 5px; }
+  .flag-bar div { flex: 1; }
+  .flag-green { background: var(--verde); }
+  .flag-white { background: var(--bianco); border-bottom: 1px solid #eee; }
+  .flag-red { background: var(--rosso); }
+
+  header.topbar {
+    padding: 22px 28px;
+    border-bottom: 1px solid var(--border);
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+
+  .brand-sub {
+    font-size: 11px;
+    color: var(--grigio);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 2px;
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .btn {
+    font-family: 'Lora', serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--nero);
+    cursor: pointer;
+    transition: background 0.15s, transform 0.05s;
+  }
+
+  .btn:hover { background: var(--grigio-light); }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--azzurro); color: #fff; border-color: var(--azzurro); }
+  .btn-primary:hover { background: var(--azzurro-deep); }
+  .btn-primary:disabled { background: #d9b8a4; border-color: #d9b8a4; cursor: wait; }
+  .btn-ghost { background: transparent; border-color: transparent; color: var(--grigio); }
+  .btn-ghost:hover { background: var(--grigio-light); color: var(--nero); }
+
+  main {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 0;
+    height: calc(100vh - 5px - 75px);
+  }
+
+  .panel {
+    overflow-y: auto;
+    padding: 24px;
+  }
+
+  .panel.left {
+    border-right: 1px solid var(--border);
+    background: #fff;
+  }
+
+  .panel.right {
+    background: var(--grigio-light);
+    padding: 0;
+  }
+
+  .preview-frame {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #fff;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--nero);
+    margin-bottom: 10px;
+  }
+
+  .help {
+    font-size: 12px;
+    color: var(--grigio);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  .drop {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 22px;
+    text-align: center;
+    transition: all 0.15s;
+    cursor: pointer;
+    background: #fff;
+  }
+
+  .drop:hover, .drop.drag { border-color: var(--azzurro); background: var(--azzurro-light); }
+  .drop-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .drop-sub { font-size: 12px; color: var(--grigio); }
+  .drop input { display: none; }
+
+  .file-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--azzurro-light);
+    color: var(--azzurro);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 100px;
+    margin-top: 10px;
+  }
+
+  .file-chip button {
+    background: none;
+    border: none;
+    color: var(--azzurro);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0 0 0 4px;
+    line-height: 1;
+  }
+
+  textarea, input[type=text], input[type=date], input[type=time], input[type=tel], input[type=email], input[type=password], select {
+    width: 100%;
+    font-family: 'Lora', serif;
+    font-size: 13px;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--nero);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  textarea:focus, input:focus, select:focus { border-color: var(--azzurro); }
+
+  textarea { resize: vertical; font-family: 'Lora', serif; line-height: 1.5; }
+  textarea.raw { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--grigio);
+    margin-bottom: 5px;
+    margin-top: 12px;
+  }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  .divider {
+    border-top: 1px solid var(--border);
+    margin: 22px 0;
+  }
+
+  details {
+    margin-bottom: 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  details[open] { box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+
+  details summary {
+    padding: 12px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  details summary::-webkit-details-marker { display: none; }
+  details summary::after {
+    content: '▾';
+    font-size: 10px;
+    color: var(--grigio);
+    transition: transform 0.15s;
+  }
+  details[open] summary::after { transform: rotate(180deg); }
+
+  .details-body { padding: 0 14px 14px 14px; }
+
+  .list-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    padding: 10px;
+    background: var(--grigio-light);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    align-items: start;
+  }
+
+  .list-item .row, .list-item .row-3 { margin-top: 0; }
+  .list-item label { margin-top: 6px; }
+  .list-item label:first-child { margin-top: 0; }
+
+  .remove-btn {
+    background: none;
+    border: none;
+    color: var(--rosso);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 4px;
+    line-height: 1;
+  }
+
+  .add-btn {
+    width: 100%;
+    padding: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--azzurro);
+    background: var(--azzurro-light);
+    border: 1px dashed var(--azzurro);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .add-btn:hover { background: #fce4d2; }
+
+  .status {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .status.info { background: #EFF6FF; color: #1E40AF; }
+  .status.err { background: var(--rosso-soft); color: var(--rosso); }
+  .status.ok { background: var(--verde-soft); color: var(--verde); }
+
+  .tab-row {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .tab {
+    padding: 9px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--grigio);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+
+  .tab.active { color: var(--azzurro); border-bottom-color: var(--azzurro); }
+
+  .muted { color: var(--grigio); font-size: 12px; }
+
+  .empty-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--grigio);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    padding: 40px;
+    text-align: center;
+  }
+
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; height: auto; }
+    .panel.right { height: 100vh; }
+  }
+</style>
+</head>
+<body>
+
+<div class="flag-bar">
+  <div class="flag-green"></div>
+  <div class="flag-white"></div>
+  <div class="flag-red"></div>
+</div>
+
+<header class="topbar">
+  <div>
+    <div class="brand">Shoot Itinerary Maker</div>
+    <div class="brand-sub">Marco Wang Photography · Planner → Photo Team</div>
+  </div>
+  <div class="actions">
+    <button class="btn btn-ghost" id="btn-settings">Settings</button>
+    <button class="btn" id="btn-reset">Reset</button>
+    <button class="btn btn-primary" id="btn-download">Download HTML</button>
+  </div>
+</header>
+
+<main>
+  <section class="panel left" id="editor">
+
+    <div class="tab-row">
+      <div class="tab active" data-tab="source">1. Source</div>
+      <div class="tab" data-tab="details">2. Details</div>
+      <div class="tab" data-tab="timeline">3. Timeline</div>
+      <div class="tab" data-tab="team">4. Team</div>
+    </div>
+
+    <!-- ====== TAB: SOURCE ====== -->
+    <div class="tab-pane" data-pane="source">
+      <div class="section-title">Upload Planner Doc</div>
+      <div class="help">Drop a wedding planner timeline (PDF, DOCX, or text). Couple names, date, venues, and timeline will auto-populate.</div>
+
+      <label class="drop" id="drop">
+        <input type="file" id="file-input" accept=".pdf,.docx,.txt,.md">
+        <div class="drop-title">Drop file or click to upload</div>
+        <div class="drop-sub">PDF · DOCX · TXT — up to ~20 pages</div>
+      </label>
+      <div id="file-chip-wrap"></div>
+
+      <label>Or paste text</label>
+      <textarea id="raw-text" class="raw" rows="8" placeholder="Paste the timeline text here..."></textarea>
+
+      <div style="display:flex; gap:8px; margin-top:14px;">
+        <button class="btn btn-primary" id="btn-extract" style="flex:1;">Extract with AI</button>
+        <button class="btn" id="btn-skip">Skip → Fill manually</button>
+      </div>
+
+      <div id="extract-status"></div>
+
+      <div class="divider"></div>
+      <div class="section-title">Settings</div>
+      <div class="help">Your Anthropic API key is stored locally in this browser only. Used to call Claude for extraction.</div>
+      <label>Anthropic API Key</label>
+      <input type="password" id="api-key" placeholder="sk-ant-...">
+      <div class="muted" style="margin-top:6px;">Saved to localStorage. Never sent anywhere except Anthropic.</div>
+    </div>
+
+    <!-- ====== TAB: DETAILS ====== -->
+    <div class="tab-pane" data-pane="details" hidden>
+      <div class="section-title">Couple & Date</div>
+      <div class="row">
+        <div>
+          <label>Partner 1</label>
+          <input type="text" id="f-p1" placeholder="Chloe Kissner">
+        </div>
+        <div>
+          <label>Partner 2</label>
+          <input type="text" id="f-p2" placeholder="Jett Lucia">
+        </div>
+      </div>
+      <label>Wedding Date</label>
+      <input type="date" id="f-date">
+
+      <div class="row">
+        <div>
+          <label>City</label>
+          <input type="text" id="f-city" placeholder="San Miguel de Allende">
+        </div>
+        <div>
+          <label>Region / Country</label>
+          <input type="text" id="f-region" placeholder="México">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-title">Photo Coverage</div>
+      <div class="row-3">
+        <div>
+          <label>Start</label>
+          <input type="time" id="f-cov-start">
+        </div>
+        <div>
+          <label>End</label>
+          <input type="time" id="f-cov-end">
+        </div>
+        <div>
+          <label>Hours</label>
+          <input type="text" id="f-cov-hours" placeholder="10">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-title">Venues</div>
+      <div id="venues-list"></div>
+      <button class="add-btn" data-add="venue">+ Add venue</button>
+
+      <div class="divider"></div>
+      <div class="section-title">Notes for Photo / Video Team</div>
+      <textarea id="f-notes" rows="4" placeholder="Family shot priorities, don't-miss moments, venue restrictions..."></textarea>
+    </div>
+
+    <!-- ====== TAB: TIMELINE ====== -->
+    <div class="tab-pane" data-pane="timeline" hidden>
+      <div class="section-title">Events</div>
+      <div class="help">Tag each event with which day it belongs to. Times use 24h entry but render in 12h.</div>
+      <div id="events-list"></div>
+      <button class="add-btn" data-add="event">+ Add event</button>
+
+      <div class="divider"></div>
+      <div class="section-title">Family Shot List</div>
+      <div id="shots-list"></div>
+      <button class="add-btn" data-add="shot">+ Add shot</button>
+    </div>
+
+    <!-- ====== TAB: TEAM ====== -->
+    <div class="tab-pane" data-pane="team" hidden>
+      <div class="section-title">Vendors</div>
+      <div class="help">Planner, HMUA, florist, DJ, officiant, etc.</div>
+      <div id="vendors-list"></div>
+      <button class="add-btn" data-add="vendor">+ Add vendor</button>
+
+      <div class="divider"></div>
+      <div class="section-title">Photo Team</div>
+      <div id="team-list"></div>
+      <button class="add-btn" data-add="team">+ Add crew member</button>
+    </div>
+
+  </section>
+
+  <section class="panel right">
+    <iframe class="preview-frame" id="preview"></iframe>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs" type="module"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
+<script type="module">
+  import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs';
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs';
+  window.__pdfjs = pdfjsLib;
+</script>
+
+<script>
+/* ============================================================
+   STATE
+   ============================================================ */
+const LS_KEY = 'mwp-planner-state-v1';
+const LS_API = 'mwp-planner-apikey';
+
+const DEFAULT_STATE = {
+  couple: { p1: '', p2: '' },
+  date: '',
+  city: '',
+  region: '',
+  coverage: { start: '', end: '', hours: '' },
+  venues: [],
+  events: [],
+  shots: [],
+  vendors: [],
+  team: [
+    { name: 'Marco Wang', role: 'Photographer', phone: '+18324514298' }
+  ],
+  notes: ''
+};
+
+let state = loadState();
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return structuredClone(DEFAULT_STATE);
+    return { ...structuredClone(DEFAULT_STATE), ...JSON.parse(raw) };
+  } catch { return structuredClone(DEFAULT_STATE); }
+}
+
+function saveState() {
+  localStorage.setItem(LS_KEY, JSON.stringify(state));
+  renderPreview();
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    const id = t.dataset.tab;
+    document.querySelectorAll('.tab-pane').forEach(p => p.hidden = p.dataset.pane !== id);
+  });
+});
+
+/* ============================================================
+   FILE UPLOAD
+   ============================================================ */
+const drop = document.getElementById('drop');
+const fileInput = document.getElementById('file-input');
+const rawText = document.getElementById('raw-text');
+const fileChipWrap = document.getElementById('file-chip-wrap');
+
+['dragover', 'dragenter'].forEach(ev => drop.addEventListener(ev, e => {
+  e.preventDefault(); drop.classList.add('drag');
+}));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => {
+  e.preventDefault(); drop.classList.remove('drag');
+}));
+drop.addEventListener('drop', e => {
+  const f = e.dataTransfer.files?.[0];
+  if (f) handleFile(f);
+});
+fileInput.addEventListener('change', e => {
+  const f = e.target.files?.[0];
+  if (f) handleFile(f);
+});
+
+async function handleFile(file) {
+  showChip(file.name);
+  setStatus('info', `Reading ${file.name}…`);
+  try {
+    const text = await extractText(file);
+    rawText.value = text;
+    setStatus('ok', `Extracted ${text.length.toLocaleString()} characters. Click "Extract with AI" to parse.`);
+  } catch (e) {
+    setStatus('err', 'Could not read file: ' + e.message);
+  }
+}
+
+function showChip(name) {
+  fileChipWrap.innerHTML = `<div class="file-chip">📄 ${escapeHtml(name)} <button onclick="this.parentElement.remove()">×</button></div>`;
+}
+
+async function extractText(file) {
+  const name = file.name.toLowerCase();
+  if (name.endsWith('.txt') || name.endsWith('.md')) {
+    return await file.text();
+  }
+  if (name.endsWith('.docx')) {
+    const buf = await file.arrayBuffer();
+    const r = await window.mammoth.extractRawText({ arrayBuffer: buf });
+    return r.value;
+  }
+  if (name.endsWith('.pdf')) {
+    const buf = await file.arrayBuffer();
+    const pdf = await window.__pdfjs.getDocument({ data: buf }).promise;
+    let out = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const p = await pdf.getPage(i);
+      const c = await p.getTextContent();
+      out += c.items.map(it => it.str).join(' ') + '\n\n';
+    }
+    return out;
+  }
+  throw new Error('Unsupported file type');
+}
+
+/* ============================================================
+   AI EXTRACTION
+   ============================================================ */
+const apiKeyInput = document.getElementById('api-key');
+apiKeyInput.value = localStorage.getItem(LS_API) || '';
+apiKeyInput.addEventListener('change', () => {
+  localStorage.setItem(LS_API, apiKeyInput.value.trim());
+});
+
+document.getElementById('btn-extract').addEventListener('click', runExtract);
+document.getElementById('btn-skip').addEventListener('click', () => {
+  document.querySelector('[data-tab="details"]').click();
+});
+
+function setStatus(kind, html) {
+  document.getElementById('extract-status').innerHTML = html
+    ? `<div class="status ${kind}">${html}</div>` : '';
+}
+
+const SCHEMA_PROMPT = `You extract wedding timeline info for a PHOTO/VIDEO team. Output ONLY valid JSON matching this schema — no prose, no markdown fences.
+
+{
+  "couple": { "p1": "string", "p2": "string" },
+  "date": "YYYY-MM-DD",
+  "city": "string",
+  "region": "string",
+  "coverage": { "start": "HH:MM", "end": "HH:MM", "hours": "string" },
+  "venues": [
+    { "name": "string", "address": "string", "role": "ceremony|reception|getting_ready|rehearsal|other", "mapsUrl": "" }
+  ],
+  "events": [
+    { "day": "YYYY-MM-DD", "time": "HH:MM", "endTime": "HH:MM or empty", "label": "string", "note": "string", "venue": "string" }
+  ],
+  "shots": ["string"],
+  "vendors": [
+    { "role": "Planner|HMUA|Florist|DJ|Officiant|Caterer|Videographer|Other", "name": "string", "phone": "", "email": "" }
+  ],
+  "team": [
+    { "name": "string", "role": "string", "phone": "" }
+  ],
+  "notes": "string"
+}
+
+Rules:
+- Partner 1 is typically listed first. Use first and last names if available.
+- Times in 24h (14:30 not 2:30 PM).
+- Events should cover rehearsal, getting-ready, ceremony, portraits, reception — in chronological order.
+- "shots" = family/group portrait list the photographer should hit.
+- "notes" = anything photo-relevant: special moments, venue rules, lighting notes.
+- If info is missing, use empty string or empty array. Do not invent.`;
+
+async function runExtract() {
+  const key = apiKeyInput.value.trim();
+  if (!key) {
+    setStatus('err', 'Add an Anthropic API key in Settings below.');
+    return;
+  }
+  const text = rawText.value.trim();
+  if (!text) {
+    setStatus('err', 'Upload a doc or paste timeline text first.');
+    return;
+  }
+
+  const btn = document.getElementById('btn-extract');
+  btn.disabled = true;
+  btn.textContent = 'Extracting…';
+  setStatus('info', 'Calling Claude…');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 4096,
+        system: SCHEMA_PROMPT,
+        messages: [{ role: 'user', content: 'Planner document:\n\n' + text }]
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`${res.status}: ${err.slice(0, 200)}`);
+    }
+
+    const data = await res.json();
+    const content = data.content?.[0]?.text || '';
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No JSON found in response');
+    const parsed = JSON.parse(jsonMatch[0]);
+
+    // merge into state
+    state = { ...state, ...parsed };
+    state.team = (parsed.team && parsed.team.length) ? parsed.team : state.team;
+    saveState();
+    renderEditors();
+    setStatus('ok', `Extracted ${parsed.events?.length || 0} events, ${parsed.venues?.length || 0} venues, ${parsed.vendors?.length || 0} vendors. Review in the other tabs.`);
+    document.querySelector('[data-tab="details"]').click();
+  } catch (e) {
+    setStatus('err', 'Extraction failed: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Extract with AI';
+  }
+}
+
+/* ============================================================
+   FORM BINDINGS
+   ============================================================ */
+function bind(id, path) {
+  const el = document.getElementById(id);
+  el.value = get(state, path) || '';
+  el.addEventListener('input', () => {
+    set(state, path, el.value);
+    saveState();
+  });
+}
+
+function get(o, p) { return p.split('.').reduce((a, k) => a?.[k], o); }
+function set(o, p, v) {
+  const parts = p.split('.');
+  const last = parts.pop();
+  const t = parts.reduce((a, k) => (a[k] ??= {}, a[k]), o);
+  t[last] = v;
+}
+
+function renderEditors() {
+  bind('f-p1', 'couple.p1');
+  bind('f-p2', 'couple.p2');
+  bind('f-date', 'date');
+  bind('f-city', 'city');
+  bind('f-region', 'region');
+  bind('f-cov-start', 'coverage.start');
+  bind('f-cov-end', 'coverage.end');
+  bind('f-cov-hours', 'coverage.hours');
+  bind('f-notes', 'notes');
+
+  renderList('venues-list', state.venues, renderVenue);
+  renderList('events-list', state.events, renderEvent);
+  renderList('shots-list', state.shots, renderShot);
+  renderList('vendors-list', state.vendors, renderVendor);
+  renderList('team-list', state.team, renderTeam);
+}
+
+function renderList(containerId, arr, itemFn) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  arr.forEach((item, i) => c.appendChild(itemFn(item, i, arr)));
+}
+
+function itemWrap(innerHtml, arr, idx) {
+  const div = document.createElement('div');
+  div.className = 'list-item';
+  div.innerHTML = `<div>${innerHtml}</div><button class="remove-btn" title="Remove">×</button>`;
+  div.querySelector('.remove-btn').addEventListener('click', () => {
+    arr.splice(idx, 1);
+    saveState();
+    renderEditors();
+  });
+  return div;
+}
+
+function field(label, value, onInput, opts = {}) {
+  const type = opts.type || 'text';
+  const placeholder = opts.placeholder || '';
+  return `<label>${label}</label><input type="${type}" value="${escapeAttr(value || '')}" placeholder="${escapeAttr(placeholder)}" data-input>`;
+}
+
+function wireItemInputs(div, item, keys) {
+  div.querySelectorAll('[data-input]').forEach((el, i) => {
+    el.addEventListener('input', () => {
+      item[keys[i]] = el.value;
+      saveState();
+    });
+  });
+}
+
+function renderVenue(v, i, arr) {
+  const html = `
+    ${field('Name', v.name, null, { placeholder: 'Templo de San Francisco' })}
+    ${field('Role', v.role, null, { placeholder: 'ceremony / reception / getting_ready / rehearsal' })}
+    ${field('Address', v.address, null, { placeholder: 'Full street address' })}
+    ${field('Google Maps URL', v.mapsUrl, null, { placeholder: 'https://maps.app.goo.gl/...' })}
+  `;
+  const div = itemWrap(html, arr, i);
+  wireItemInputs(div, v, ['name', 'role', 'address', 'mapsUrl']);
+  return div;
+}
+
+function renderEvent(e, i, arr) {
+  const html = `
+    <div class="row-3">
+      <div>${field('Day', e.day, null, { type: 'date' })}</div>
+      <div>${field('Time', e.time, null, { type: 'time' })}</div>
+      <div>${field('End (opt)', e.endTime, null, { type: 'time' })}</div>
+    </div>
+    ${field('Label', e.label, null, { placeholder: 'First look' })}
+    ${field('Venue (opt)', e.venue, null)}
+    ${field('Note (opt)', e.note, null)}
+  `;
+  const div = itemWrap(html, arr, i);
+  wireItemInputs(div, e, ['day', 'time', 'endTime', 'label', 'venue', 'note']);
+  return div;
+}
+
+function renderShot(s, i, arr) {
+  const html = field('Shot', s, null, { placeholder: 'Bride with both parents' });
+  const div = itemWrap(html, { val: s }, i);
+  const input = div.querySelector('[data-input]');
+  input.addEventListener('input', () => { arr[i] = input.value; saveState(); });
+  return div;
+}
+
+function renderVendor(v, i, arr) {
+  const html = `
+    <div class="row">
+      <div>${field('Role', v.role, null, { placeholder: 'Planner' })}</div>
+      <div>${field('Name', v.name, null)}</div>
+    </div>
+    <div class="row">
+      <div>${field('Phone', v.phone, null, { type: 'tel' })}</div>
+      <div>${field('Email', v.email, null, { type: 'email' })}</div>
+    </div>
+  `;
+  const div = itemWrap(html, arr, i);
+  wireItemInputs(div, v, ['role', 'name', 'phone', 'email']);
+  return div;
+}
+
+function renderTeam(t, i, arr) {
+  const html = `
+    <div class="row">
+      <div>${field('Name', t.name, null)}</div>
+      <div>${field('Role', t.role, null, { placeholder: 'Photographer' })}</div>
+    </div>
+    ${field('Phone', t.phone, null, { type: 'tel' })}
+  `;
+  const div = itemWrap(html, arr, i);
+  wireItemInputs(div, t, ['name', 'role', 'phone']);
+  return div;
+}
+
+document.querySelectorAll('[data-add]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const kind = btn.dataset.add;
+    const blanks = {
+      venue: { name: '', role: '', address: '', mapsUrl: '' },
+      event: { day: state.date || '', time: '', endTime: '', label: '', venue: '', note: '' },
+      shot: '',
+      vendor: { role: '', name: '', phone: '', email: '' },
+      team: { name: '', role: '', phone: '' }
+    };
+    const listKey = { venue: 'venues', event: 'events', shot: 'shots', vendor: 'vendors', team: 'team' }[kind];
+    state[listKey].push(structuredClone(blanks[kind]));
+    saveState();
+    renderEditors();
+  });
+});
+
+/* ============================================================
+   HEADER BUTTONS
+   ============================================================ */
+document.getElementById('btn-reset').addEventListener('click', () => {
+  if (!confirm('Clear all entered data?')) return;
+  state = structuredClone(DEFAULT_STATE);
+  saveState();
+  renderEditors();
+  rawText.value = '';
+  fileChipWrap.innerHTML = '';
+  setStatus('', '');
+  document.querySelector('[data-tab="source"]').click();
+});
+
+document.getElementById('btn-settings').addEventListener('click', () => {
+  document.querySelector('[data-tab="source"]').click();
+  apiKeyInput.focus();
+});
+
+document.getElementById('btn-download').addEventListener('click', () => {
+  const html = buildOutputHtml(state);
+  const couple = `${state.couple.p1 || 'couple'}-${state.couple.p2 || 'shoot'}`
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${couple}-shoot-itinerary.html`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+/* ============================================================
+   PREVIEW
+   ============================================================ */
+function renderPreview() {
+  const iframe = document.getElementById('preview');
+  const html = hasAnyData(state) ? buildOutputHtml(state)
+    : `<div style="font-family:'Cormorant Garamond',serif;display:flex;align-items:center;justify-content:center;height:100vh;color:#6B7280;font-size:22px;text-align:center;padding:40px;">Upload a planner doc<br><span style="font-size:14px;font-family:Lora,serif;">or fill in the details →</span></div>`;
+  iframe.srcdoc = html;
+}
+
+function hasAnyData(s) {
+  return s.couple.p1 || s.couple.p2 || s.events.length || s.venues.length;
+}
+
+/* ============================================================
+   OUTPUT GENERATION
+   ============================================================ */
+function buildOutputHtml(s) {
+  const title = [s.couple.p1, s.couple.p2].filter(Boolean).join(' & ') || 'Wedding';
+  const loc = [s.city, s.region].filter(Boolean).join(', ');
+  const dateStr = s.date ? formatLongDate(s.date) : '';
+
+  const eventsByDay = groupEventsByDay(s.events || []);
+  const venueMap = Object.fromEntries((s.venues || []).map(v => [v.name?.toLowerCase(), v]));
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHtml(title)} — Shoot Itinerary</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700&family=Lora:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azzurro: #C2663A; --azzurro-deep: #A8532D; --azzurro-light: #FDF0EA;
+    --rosso: #CE2B37; --rosso-soft: #FFF0F0;
+    --verde: #008C45; --verde-soft: #EEFAF3;
+    --bianco: #FFFFFF; --nero: #1A1A1A; --grigio: #6B7280;
+    --grigio-light: #F3F4F6; --bg: #FAFBFC;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Lora',serif; background:var(--bg); color:var(--nero); min-height:100vh; -webkit-font-smoothing:antialiased; }
+  .flag-bar { display:flex; height:5px; }
+  .flag-bar div { flex:1; }
+  .flag-green { background:var(--verde); }
+  .flag-white { background:#fff; border-bottom:1px solid #eee; }
+  .flag-red { background:var(--rosso); }
+  .hero { background:var(--azzurro); color:#fff; padding:48px 40px 40px; }
+  .hero-inner { max-width:800px; margin:0 auto; }
+  .hero-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; }
+  .hero-tag { font-size:11px; font-weight:600; letter-spacing:3px; text-transform:uppercase; background:rgba(255,255,255,0.15); padding:6px 14px; border-radius:100px; }
+  .hero-flag { display:flex; gap:3px; }
+  .hero-flag span { width:18px; height:26px; border-radius:3px; }
+  .hf-green { background:var(--verde); } .hf-white { background:rgba(255,255,255,0.9); } .hf-red { background:var(--rosso); }
+  .hero h1 { font-family:'Cormorant Garamond',serif; font-size:48px; font-weight:700; line-height:1.05; margin-bottom:6px; letter-spacing:-1px; }
+  .hero .location { font-family:'Cormorant Garamond',serif; font-size:20px; opacity:0.75; margin-bottom:18px; }
+  .hero .date-strip { display:inline-flex; align-items:center; gap:10px; font-size:14px; font-weight:500; background:rgba(255,255,255,0.12); padding:10px 20px; border-radius:8px; border:1px solid rgba(255,255,255,0.15); }
+  .container { max-width:800px; margin:0 auto; padding:36px 24px 60px; }
+  .section { margin-bottom:36px; }
+  .section-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .section-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; }
+  .icon-blue { background:var(--azzurro-light); color:var(--azzurro); }
+  .icon-green { background:var(--verde-soft); color:var(--verde); }
+  .icon-red { background:var(--rosso-soft); color:var(--rosso); }
+  .section-title { font-family:'Cormorant Garamond',serif; font-size:13px; font-weight:700; letter-spacing:3px; text-transform:uppercase; }
+  .card { background:#fff; border:1px solid #E5E7EB; border-radius:12px; padding:20px 24px; margin-bottom:10px; }
+  .tl { display:grid; grid-template-columns:110px 1fr; gap:4px 12px; font-size:13px; line-height:1.7; }
+  .tl-time { font-weight:600; color:var(--nero); white-space:nowrap; text-align:right; }
+  .tl-desc { color:var(--grigio); }
+  .tl-desc.highlight { color:#D97706; font-weight:500; }
+  .day-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; margin-bottom:4px; }
+  .day-meta { display:flex; align-items:center; gap:8px; margin-bottom:10px; font-size:11px; color:var(--grigio); text-transform:uppercase; letter-spacing:1px; }
+  .day-meta .dot { color:#d1d5db; }
+  .venue-pill { display:inline-block; font-size:11px; padding:3px 10px; border-radius:100px; background:var(--azzurro-light); color:var(--azzurro); text-decoration:none; margin-right:6px; margin-bottom:4px; font-weight:500; }
+  .venue-pill:hover { background:#fce4d2; }
+  .venue-card { border-left:3px solid var(--azzurro); padding-left:14px; margin-bottom:12px; }
+  .venue-card:last-child { margin-bottom:0; }
+  .venue-card .role { font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:var(--grigio); font-weight:600; }
+  .venue-card .name { font-family:'Cormorant Garamond',serif; font-size:17px; font-weight:600; margin-top:2px; }
+  .venue-card .addr { font-size:12px; color:var(--grigio); margin-top:2px; line-height:1.5; }
+  .venue-card a { color:var(--azzurro); text-decoration:none; }
+  .venue-card a:hover { text-decoration:underline; }
+  .vendor-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #F3F4F6; gap:12px; flex-wrap:wrap; }
+  .vendor-row:last-child { border-bottom:0; }
+  .vendor-role { font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:var(--grigio); font-weight:600; min-width:80px; }
+  .vendor-name { font-weight:600; font-size:14px; }
+  .vendor-contact { font-size:12px; color:var(--azzurro); text-decoration:none; }
+  .vendor-contact:hover { text-decoration:underline; }
+  .shot-list { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:6px 16px; font-size:13px; line-height:1.7; list-style:none; }
+  .shot-list li { padding-left:18px; position:relative; color:var(--nero); }
+  .shot-list li::before { content:'□'; position:absolute; left:0; color:var(--azzurro); font-weight:600; }
+  .key-times { display:flex; flex-wrap:wrap; gap:14px 24px; font-size:12px; color:var(--grigio); margin-bottom:16px; }
+  .key-times span { display:inline-flex; align-items:center; gap:5px; }
+  .notes-card { background:#FFFBEB; border:1px solid #FDE68A; color:#78350F; }
+  .notes-card .notes-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; color:#92400E; }
+  .notes-card p { font-size:13px; line-height:1.6; white-space:pre-wrap; }
+  .coverage-row { display:flex; gap:22px; align-items:center; flex-wrap:wrap; }
+  .coverage-row .cov-num { font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:700; color:var(--azzurro); }
+  .coverage-row .cov-label { font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:var(--grigio); font-weight:600; margin-top:2px; }
+  @media (max-width:640px) {
+    .hero h1 { font-size:36px; }
+    .tl { grid-template-columns:90px 1fr; gap:2px 8px; font-size:12px; }
+    .hero-top { flex-direction:column; gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="flag-bar">
+  <div class="flag-green"></div><div class="flag-white"></div><div class="flag-red"></div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-top">
+      <div class="hero-tag">Marco Wang Photography · Shoot Itinerary</div>
+      <div class="hero-flag">
+        <span class="hf-green"></span><span class="hf-white"></span><span class="hf-red"></span>
+      </div>
+    </div>
+    <h1>${escapeHtml(s.couple.p1 || '')}${s.couple.p2 ? ' &amp;<br>' + escapeHtml(s.couple.p2) : ''}</h1>
+    ${loc ? `<div class="location">${escapeHtml(loc)}</div>` : ''}
+    ${dateStr ? `<div class="date-strip"><span>${dateStr}</span></div>` : ''}
+  </div>
+</div>
+
+<div class="container">
+
+  ${renderCoverageSection(s)}
+  ${renderKeyTimesSection(s)}
+  ${renderTimelineSection(eventsByDay)}
+  ${renderVenuesSection(s.venues)}
+  ${renderShotsSection(s.shots)}
+  ${renderVendorsSection(s.vendors)}
+  ${renderTeamSection(s.team)}
+  ${renderNotesSection(s.notes)}
+
+</div>
+
+${s.date && hasVenueCoords(s) ? renderWeatherScript(s) : ''}
+
+</body>
+</html>`;
+}
+
+function renderCoverageSection(s) {
+  const c = s.coverage || {};
+  if (!c.start && !c.end && !c.hours) return '';
+  return `
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-blue">📸</div>
+      <div class="section-title">Photo Coverage</div>
+    </div>
+    <div class="card">
+      <div class="coverage-row">
+        ${c.start ? `<div><div class="cov-num">${formatTime(c.start)}</div><div class="cov-label">Start</div></div>` : ''}
+        ${c.end ? `<div><div class="cov-num">${formatTime(c.end)}</div><div class="cov-label">End</div></div>` : ''}
+        ${c.hours ? `<div><div class="cov-num">${escapeHtml(c.hours)}h</div><div class="cov-label">Total</div></div>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderKeyTimesSection(s) {
+  if (!s.date) return '';
+  return `
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-red">☀️</div>
+      <div class="section-title">Key Times</div>
+    </div>
+    <div class="key-times" id="key-times">
+      <span>Loading sun times for ${escapeHtml(s.city || 'venue')}…</span>
+    </div>
+  </div>`;
+}
+
+function renderTimelineSection(byDay) {
+  const days = Object.keys(byDay).sort();
+  if (!days.length) return '';
+  const sections = days.map(d => {
+    const events = byDay[d];
+    const dt = new Date(d + 'T00:00:00');
+    const dayName = isNaN(dt) ? '' : dt.toLocaleDateString('en-US', { weekday: 'long' });
+    const monthDay = isNaN(dt) ? d : dt.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+    const rows = events.map(e => {
+      const time = e.endTime ? `${formatTime(e.time)}–${formatTime(e.endTime)}` : formatTime(e.time);
+      const isHot = /ceremony|first look|golden|exit|sparkler|grand|cake|first dance/i.test(e.label);
+      const cls = isHot ? 'tl-desc highlight' : 'tl-desc';
+      const note = e.note ? ` <span style="color:#9ca3af;">· ${escapeHtml(e.note)}</span>` : '';
+      const venue = e.venue ? ` <span style="color:#9ca3af;">· ${escapeHtml(e.venue)}</span>` : '';
+      return `<div class="tl-time">${escapeHtml(time || '')}</div><div class="${cls}">${escapeHtml(e.label || '')}${venue}${note}</div>`;
+    }).join('');
+    return `<div class="card">
+      <div class="day-meta"><span>${dayName}</span>${dayName ? '<span class="dot">·</span>' : ''}<span>${monthDay}</span></div>
+      <div class="tl">${rows}</div>
+    </div>`;
+  }).join('');
+  return `
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-red">📅</div>
+      <div class="section-title">Timeline</div>
+    </div>
+    ${sections}
+  </div>`;
+}
+
+function renderVenuesSection(venues) {
+  if (!venues?.length) return '';
+  const items = venues.map(v => `
+    <div class="venue-card">
+      ${v.role ? `<div class="role">${escapeHtml(v.role).replace(/_/g, ' ')}</div>` : ''}
+      <div class="name">${escapeHtml(v.name || '')}</div>
+      ${v.address ? `<div class="addr">${v.mapsUrl ? `<a href="${escapeAttr(v.mapsUrl)}" target="_blank" rel="noopener">${escapeHtml(v.address)} ↗</a>` : escapeHtml(v.address)}</div>` : ''}
+    </div>`).join('');
+  return `
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-blue">📍</div>
+      <div class="section-title">Venues</div>
+    </div>
+    <div class="card">${items}</div>
+  </div>`;
+}
+
+function renderShotsSection(shots) {
+  if (!shots?.length) return '';
+  const items = shots.map(s => `<li>${escapeHtml(s || '')}</li>`).join('');
+  return `
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-green">✓</div>
+      <div class="section-title">Family Shot List</div>
+    </div>
+    <div class="card"><ul class="shot-list">${items}</ul></div>
+  </div>`;
+}
+
+function renderVendorsSection(vendors) {
+  if (!vendors?.length) return '';
+  const rows = vendors.map(v => `
+    <div class="vendor-row">
+      <div style="flex:1; min-width:180px;">
+        <div class="vendor-role">${escapeHtml(v.role || '')}</div>
+        <div class="vendor-name">${escapeHtml(v.name || '')}</div>
+      </div>
+      <div style="display:flex; gap:12px;">
+        ${v.phone ? `<a class="vendor-contact" href="tel:${escapeAttr(v.phone)}">${escapeHtml(v.phone)}</a>` : ''}
+        ${v.email ? `<a class="vendor-contact" href="mailto:${escapeAttr(v.email)}">${escapeHtml(v.email)}</a>` : ''}
+      </div>
+    </div>`).join('');
+  return `
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-blue">📇</div>
+      <div class="section-title">Vendors</div>
+    </div>
+    <div class="card">${rows}</div>
+  </div>`;
+}
+
+function renderTeamSection(team) {
+  if (!team?.length) return '';
+  const rows = team.map(t => `
+    <div class="vendor-row">
+      <div style="flex:1; min-width:180px;">
+        <div class="vendor-role">${escapeHtml(t.role || '')}</div>
+        <div class="vendor-name">${escapeHtml(t.name || '')}</div>
+      </div>
+      ${t.phone ? `<div style="display:flex; gap:8px;">
+        <a class="vendor-contact" href="tel:${escapeAttr(t.phone)}">Call</a>
+        <a class="vendor-contact" href="sms:${escapeAttr(t.phone)}">Text</a>
+      </div>` : ''}
+    </div>`).join('');
+  return `
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-blue">👥</div>
+      <div class="section-title">Photo Team</div>
+    </div>
+    <div class="card">${rows}</div>
+  </div>`;
+}
+
+function renderNotesSection(notes) {
+  if (!notes?.trim()) return '';
+  return `
+  <div class="section">
+    <div class="card notes-card">
+      <div class="notes-title">Notes for the team</div>
+      <p>${escapeHtml(notes)}</p>
+    </div>
+  </div>`;
+}
+
+function renderWeatherScript(s) {
+  // Uses open-meteo for sunrise/sunset at a default city lookup via geocoding.
+  return `
+<script>
+(function(){
+  var el = document.getElementById('key-times');
+  if (!el) return;
+  var city = ${JSON.stringify(s.city || '')};
+  var date = ${JSON.stringify(s.date)};
+  if (!city || !date) return;
+  fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&name=' + encodeURIComponent(city))
+    .then(function(r){return r.json();})
+    .then(function(g){
+      var hit = g.results && g.results[0];
+      if (!hit) throw new Error('no geo');
+      return fetch('https://api.open-meteo.com/v1/forecast?latitude=' + hit.latitude + '&longitude=' + hit.longitude + '&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weathercode&temperature_unit=fahrenheit&timezone=auto&start_date=' + date + '&end_date=' + date);
+    })
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var sr = new Date(d.daily.sunrise[0]);
+      var ss = new Date(d.daily.sunset[0]);
+      var gh = new Date(ss.getTime() - 60*60*1000);
+      function fmt(dt){ return dt.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); }
+      var hi = Math.round(d.daily.temperature_2m_max[0]);
+      var lo = Math.round(d.daily.temperature_2m_min[0]);
+      el.innerHTML =
+        '<span>☀️ Sunrise ' + fmt(sr) + '</span>' +
+        '<span>🌇 Golden hour begins ~' + fmt(gh) + '</span>' +
+        '<span>🌙 Sunset ' + fmt(ss) + '</span>' +
+        '<span>🌡 ' + hi + '° / ' + lo + '°F</span>';
+    })
+    .catch(function(){ el.innerHTML = '<span style="opacity:0.6;">Sun times unavailable</span>'; });
+})();
+<\/script>`;
+}
+
+/* ============================================================
+   UTILS
+   ============================================================ */
+function groupEventsByDay(events) {
+  const out = {};
+  (events || []).forEach(e => {
+    const day = e.day || '_';
+    (out[day] ||= []).push(e);
+  });
+  Object.values(out).forEach(arr => arr.sort((a, b) => (a.time || '').localeCompare(b.time || '')));
+  return out;
+}
+
+function hasVenueCoords(s) { return !!s.city; }
+
+function formatTime(t) {
+  if (!t) return '';
+  const [h, m] = t.split(':').map(Number);
+  if (isNaN(h)) return t;
+  const period = h >= 12 ? 'PM' : 'AM';
+  const h12 = ((h + 11) % 12) + 1;
+  return `${h12}:${String(m || 0).padStart(2, '0')} ${period}`;
+}
+
+function formatLongDate(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  if (isNaN(d)) return iso;
+  return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function escapeAttr(s) { return escapeHtml(s); }
+
+/* ============================================================
+   INIT
+   ============================================================ */
+renderEditors();
+renderPreview();
+</script>
+
+</body>
+</html>
