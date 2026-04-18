@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wedding Shoot Itinerary Maker — Marco Wang Photography</title>
 <meta name="robots" content="noindex, nofollow">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700&family=Lora:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     /* Warm editorial palette — romantic / luxury weddings */
@@ -23,16 +25,21 @@
     --bg: #FAF7F2;             /* ivory page */
     --border: #E8DFD4;         /* warm border */
     --mocha: #4A3F36;          /* deep warm brown — hero */
+
+    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'Lora', serif;
+    font-family: var(--font-body);
     background: var(--bg);
     color: var(--nero);
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'ss01', 'cv11';
+    letter-spacing: -0.005em;
   }
 
   /* Subtle champagne hairline in place of the old flag bar */
@@ -50,10 +57,11 @@
   }
 
   .brand {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    font-variation-settings: 'opsz' 48, 'SOFT' 50;
   }
 
   .brand-sub {
@@ -71,7 +79,7 @@
   }
 
   .btn {
-    font-family: 'Lora', serif;
+    font-family: var(--font-body);
     font-size: 13px;
     font-weight: 600;
     padding: 9px 16px;
@@ -121,12 +129,12 @@
   }
 
   .section-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 3px;
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3.5px;
     text-transform: uppercase;
-    color: var(--nero);
+    color: var(--azzurro-deep);
     margin-bottom: 10px;
   }
 
@@ -177,7 +185,7 @@
 
   textarea, input[type=text], input[type=date], input[type=time], input[type=tel], input[type=email], input[type=password], select {
     width: 100%;
-    font-family: 'Lora', serif;
+    font-family: var(--font-body);
     font-size: 13px;
     padding: 9px 12px;
     border: 1px solid var(--border);
@@ -190,7 +198,7 @@
 
   textarea:focus, input:focus, select:focus { border-color: var(--azzurro); }
 
-  textarea { resize: vertical; font-family: 'Lora', serif; line-height: 1.5; }
+  textarea { resize: vertical; font-family: var(--font-body); line-height: 1.5; }
   textarea.raw { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
 
   label {
@@ -319,7 +327,7 @@
     justify-content: center;
     height: 100%;
     color: var(--grigio);
-    font-family: 'Cormorant Garamond', serif;
+    font-family: var(--font-display);
     font-size: 22px;
     padding: 40px;
     text-align: center;
@@ -437,8 +445,12 @@
       <button class="add-btn" data-add="venue">+ Add venue</button>
 
       <div class="divider"></div>
-      <div class="section-title">Notes for Photo / Video Team</div>
-      <textarea id="f-notes" rows="4" placeholder="Family shot priorities, don't-miss moments, venue restrictions..."></textarea>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div class="section-title" style="margin-bottom:0;">Notes for Photo / Video Team</div>
+        <button class="btn" id="btn-format-notes" style="padding:5px 10px; font-size:11px;">✦ Format with AI</button>
+      </div>
+      <textarea id="f-notes" rows="8" placeholder="Dump anything relevant — family dynamics, must-capture moments, venue restrictions, sensitivities. Click 'Format with AI' to organize."></textarea>
+      <div id="notes-status"></div>
     </div>
 
     <!-- ====== TAB: TIMELINE ====== -->
@@ -609,10 +621,68 @@ document.getElementById('btn-extract').addEventListener('click', runExtract);
 document.getElementById('btn-skip').addEventListener('click', () => {
   document.querySelector('[data-tab="details"]').click();
 });
+document.getElementById('btn-format-notes').addEventListener('click', runFormatNotes);
 
 function setStatus(kind, html) {
   document.getElementById('extract-status').innerHTML = html
     ? `<div class="status ${kind}">${html}</div>` : '';
+}
+
+function setNotesStatus(kind, html) {
+  document.getElementById('notes-status').innerHTML = html
+    ? `<div class="status ${kind}" style="margin-top:8px;">${html}</div>` : '';
+}
+
+const NOTES_PROMPT = `You format free-text notes for a wedding PHOTO/VIDEO team. Reorganize into concise, scannable markdown. Rules:
+
+- Group into 2-5 short sections using "## Heading" (e.g., "## Must-Capture", "## Family Dynamics", "## Venue Notes", "## Sensitivities", "## Lighting").
+- Under each heading, use "- " bullets. One fact per bullet. Keep it tight — the team reads this at 2am on a phone.
+- Preserve all facts and specifics (names, times, places). Do not invent.
+- Drop filler and pleasantries. No preamble.
+
+Output ONLY the markdown — no explanation, no code fences.`;
+
+async function runFormatNotes() {
+  const key = apiKeyInput.value.trim();
+  if (!key) { setNotesStatus('err', 'Add an Anthropic API key on the Source tab.'); return; }
+  const ta = document.getElementById('f-notes');
+  const text = ta.value.trim();
+  if (!text) { setNotesStatus('err', 'Nothing to format — type some notes first.'); return; }
+
+  const btn = document.getElementById('btn-format-notes');
+  const orig = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Formatting…';
+  setNotesStatus('info', 'Asking Claude to organize your notes…');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 1500,
+        system: NOTES_PROMPT,
+        messages: [{ role: 'user', content: text }]
+      })
+    });
+    if (!res.ok) throw new Error((await res.text()).slice(0, 200));
+    const data = await res.json();
+    const out = (data.content?.[0]?.text || '').trim().replace(/^```(?:markdown)?\s*|\s*```$/g, '');
+    if (!out) throw new Error('Empty response');
+    ta.value = out;
+    state.notes = out;
+    saveState();
+    setNotesStatus('ok', 'Formatted. Preview updated.');
+  } catch (e) {
+    setNotesStatus('err', 'Format failed: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = orig;
+  }
 }
 
 const SCHEMA_PROMPT = `You extract wedding timeline info for a PHOTO/VIDEO team. Output ONLY valid JSON matching this schema — no prose, no markdown fences.
@@ -898,7 +968,7 @@ document.getElementById('btn-download').addEventListener('click', () => {
 function renderPreview() {
   const iframe = document.getElementById('preview');
   const html = hasAnyData(state) ? buildOutputHtml(state)
-    : `<div style="font-family:'Cormorant Garamond',serif;display:flex;align-items:center;justify-content:center;height:100vh;color:#6B7280;font-size:22px;text-align:center;padding:40px;">Upload a planner doc<br><span style="font-size:14px;font-family:Lora,serif;">or fill in the details →</span></div>`;
+    : `<div style="font-family:Fraunces,Georgia,serif;display:flex;align-items:center;justify-content:center;height:100vh;color:#8A7F75;font-size:26px;text-align:center;padding:40px;font-style:italic;font-weight:300;">Upload a planner doc<div style="font-size:11px;font-family:Inter,sans-serif;font-style:normal;letter-spacing:2.5px;text-transform:uppercase;margin-top:14px;color:#B08968;">or fill in the details →</div></div>`;
   iframe.srcdoc = html;
 }
 
@@ -924,7 +994,7 @@ function buildOutputHtml(s) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${escapeHtml(title)} — Shoot Itinerary</title>
 <meta name="robots" content="noindex, nofollow">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700&family=Lora:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     /* Warm editorial palette — romantic / luxury weddings */
@@ -934,9 +1004,11 @@ function buildOutputHtml(s) {
     --bianco: #FFFFFF; --nero: #2A2520; --grigio: #8A7F75;
     --grigio-light: #F5EFE6; --bg: #FAF7F2;
     --border: #E8DFD4; --mocha: #4A3F36;
+    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Lora',serif; background:var(--bg); color:var(--nero); min-height:100vh; -webkit-font-smoothing:antialiased; }
+  body { font-family:var(--font-body); background:var(--bg); color:var(--nero); min-height:100vh; -webkit-font-smoothing:antialiased; letter-spacing:-0.005em; }
   .flag-bar { height:2px; background:linear-gradient(90deg, transparent 0%, var(--azzurro) 20%, var(--azzurro) 80%, transparent 100%); opacity:0.6; }
   .flag-bar div { display:none; }
   .hero { background:var(--mocha); color:#fff; padding:56px 40px 48px; }
@@ -944,9 +1016,9 @@ function buildOutputHtml(s) {
   .hero-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:28px; }
   .hero-tag { font-size:10px; font-weight:500; letter-spacing:3.5px; text-transform:uppercase; color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.22); padding:7px 14px; border-radius:100px; }
   .hero-flag { width:32px; height:1px; background:var(--azzurro); opacity:0.9; margin-top:14px; }
-  .hero h1 { font-family:'Cormorant Garamond',serif; font-size:56px; font-weight:600; line-height:1.04; margin-bottom:10px; letter-spacing:-0.5px; }
-  .hero h1 em { font-style:italic; font-weight:400; color:var(--azzurro); }
-  .hero .location { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:19px; font-weight:400; opacity:0.75; margin-bottom:22px; }
+  .hero h1 { font-family:var(--font-display); font-size:62px; font-weight:400; line-height:1.02; margin-bottom:12px; letter-spacing:-0.01em; font-variation-settings:'opsz' 144, 'SOFT' 50; }
+  .hero h1 em { font-style:italic; font-weight:300; color:var(--azzurro); font-variation-settings:'opsz' 144, 'SOFT' 100; }
+  .hero .location { font-family:var(--font-display); font-style:italic; font-size:19px; font-weight:400; opacity:0.75; margin-bottom:24px; letter-spacing:0.01em; }
   .hero .date-strip { display:inline-flex; align-items:center; gap:10px; font-size:11px; font-weight:500; letter-spacing:2.5px; text-transform:uppercase; color:rgba(255,255,255,0.8); padding-top:14px; border-top:1px solid rgba(255,255,255,0.18); }
   .container { max-width:800px; margin:0 auto; padding:36px 24px 60px; }
   .section { margin-bottom:36px; }
@@ -955,13 +1027,13 @@ function buildOutputHtml(s) {
   .icon-blue { background:var(--azzurro-light); color:var(--azzurro); }
   .icon-green { background:var(--verde-soft); color:var(--verde); }
   .icon-red { background:var(--rosso-soft); color:var(--rosso); }
-  .section-title { font-family:'Cormorant Garamond',serif; font-size:13px; font-weight:700; letter-spacing:3px; text-transform:uppercase; }
+  .section-title { font-family:var(--font-body); font-size:11px; font-weight:600; letter-spacing:3.5px; text-transform:uppercase; color:var(--azzurro-deep); }
   .card { background:#fff; border:1px solid #E5E7EB; border-radius:12px; padding:20px 24px; margin-bottom:10px; }
   .tl { display:grid; grid-template-columns:110px 1fr; gap:4px 12px; font-size:13px; line-height:1.7; }
   .tl-time { font-weight:600; color:var(--nero); white-space:nowrap; text-align:right; }
   .tl-desc { color:var(--grigio); }
   .tl-desc.highlight { color:#D97706; font-weight:500; }
-  .day-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; margin-bottom:4px; }
+  .day-title { font-family:var(--font-display); font-size:22px; font-weight:500; margin-bottom:4px; letter-spacing:-0.01em; }
   .day-meta { display:flex; align-items:center; gap:8px; margin-bottom:10px; font-size:11px; color:var(--grigio); text-transform:uppercase; letter-spacing:1px; }
   .day-meta .dot { color:#d1d5db; }
   .venue-pill { display:inline-block; font-size:11px; padding:3px 10px; border-radius:100px; background:var(--azzurro-light); color:var(--azzurro); text-decoration:none; margin-right:6px; margin-bottom:4px; font-weight:500; }
@@ -969,7 +1041,7 @@ function buildOutputHtml(s) {
   .venue-card { border-left:3px solid var(--azzurro); padding-left:14px; margin-bottom:12px; }
   .venue-card:last-child { margin-bottom:0; }
   .venue-card .role { font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:var(--grigio); font-weight:600; }
-  .venue-card .name { font-family:'Cormorant Garamond',serif; font-size:17px; font-weight:600; margin-top:2px; }
+  .venue-card .name { font-family:var(--font-display); font-size:19px; font-weight:500; margin-top:3px; letter-spacing:-0.005em; }
   .venue-card .addr { font-size:12px; color:var(--grigio); margin-top:2px; line-height:1.5; }
   .venue-card a { color:var(--azzurro); text-decoration:none; }
   .venue-card a:hover { text-decoration:underline; }
@@ -984,11 +1056,18 @@ function buildOutputHtml(s) {
   .shot-list li::before { content:'□'; position:absolute; left:0; color:var(--azzurro); font-weight:600; }
   .key-times { display:flex; flex-wrap:wrap; gap:14px 24px; font-size:12px; color:var(--grigio); margin-bottom:16px; }
   .key-times span { display:inline-flex; align-items:center; gap:5px; }
-  .notes-card { background:#FFFBEB; border:1px solid #FDE68A; color:#78350F; }
-  .notes-card .notes-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; color:#92400E; }
-  .notes-card p { font-size:13px; line-height:1.6; white-space:pre-wrap; }
+  .notes-card { background:var(--grigio-light); border:1px solid var(--border); color:var(--nero); padding:26px 28px; }
+  .notes-card .notes-title { font-family:var(--font-body); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:3.5px; margin-bottom:18px; color:var(--azzurro-deep); }
+  .notes-card .notes-subhead { font-family:var(--font-display); font-size:17px; font-weight:500; color:var(--nero); margin:16px 0 8px; letter-spacing:-0.005em; }
+  .notes-card .notes-subhead:first-child { margin-top:0; }
+  .notes-card .notes-list { list-style:none; padding:0; margin:0 0 4px; }
+  .notes-card .notes-list li { font-size:13.5px; line-height:1.65; color:var(--nero); padding-left:18px; position:relative; margin-bottom:5px; }
+  .notes-card .notes-list li::before { content:'—'; position:absolute; left:0; color:var(--azzurro); font-weight:500; }
+  .notes-card .notes-list strong { font-weight:600; }
+  .notes-card .notes-p { font-size:13.5px; line-height:1.65; margin-bottom:10px; white-space:pre-wrap; }
+  .notes-card .notes-p:last-child { margin-bottom:0; }
   .coverage-row { display:flex; gap:22px; align-items:center; flex-wrap:wrap; }
-  .coverage-row .cov-num { font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:700; color:var(--azzurro); }
+  .coverage-row .cov-num { font-family:var(--font-display); font-size:34px; font-weight:500; color:var(--azzurro); letter-spacing:-0.02em; font-variation-settings:'opsz' 96; }
   .coverage-row .cov-label { font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:var(--grigio); font-weight:600; margin-top:2px; }
   @media (max-width:640px) {
     .hero h1 { font-size:36px; }
@@ -1181,9 +1260,49 @@ function renderNotesSection(notes) {
   <div class="section">
     <div class="card notes-card">
       <div class="notes-title">Notes for the team</div>
-      <p>${escapeHtml(notes)}</p>
+      ${renderMarkdown(notes)}
     </div>
   </div>`;
+}
+
+function renderMarkdown(md) {
+  const lines = String(md).replace(/\r\n/g, '\n').split('\n');
+  let html = '', inList = false, paraBuf = [];
+  const flushPara = () => {
+    if (paraBuf.length) {
+      html += `<p class="notes-p">${paraBuf.map(escapeHtml).join(' ')}</p>`;
+      paraBuf = [];
+    }
+  };
+  const closeList = () => { if (inList) { html += '</ul>'; inList = false; } };
+  for (const raw of lines) {
+    const line = raw.trimEnd();
+    const h = line.match(/^#{1,3}\s+(.+)$/);
+    const b = line.match(/^[-*•]\s+(.+)$/);
+    if (h) {
+      flushPara(); closeList();
+      html += `<div class="notes-subhead">${escapeHtml(h[1])}</div>`;
+    } else if (b) {
+      flushPara();
+      if (!inList) { html += '<ul class="notes-list">'; inList = true; }
+      html += `<li>${inlineMarkdown(b[1])}</li>`;
+    } else if (line.trim() === '') {
+      flushPara(); closeList();
+    } else {
+      closeList();
+      paraBuf.push(line);
+    }
+  }
+  flushPara(); closeList();
+  return html || `<p class="notes-p">${escapeHtml(md)}</p>`;
+}
+
+function inlineMarkdown(s) {
+  // Escape first, then apply **bold** and *italic*
+  let out = escapeHtml(s);
+  out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  out = out.replace(/(^|[\s(])\*([^*\s][^*]*?)\*(?=[\s).,;:!?]|$)/g, '$1<em>$2</em>');
+  return out;
 }
 
 function renderWeatherScript(s) {
