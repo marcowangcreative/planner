@@ -8,19 +8,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700&family=Lora:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --azzurro: #C2663A;
-    --azzurro-deep: #A8532D;
-    --azzurro-light: #FDF0EA;
-    --rosso: #CE2B37;
-    --rosso-soft: #FFF0F0;
-    --verde: #008C45;
-    --verde-soft: #EEFAF3;
+    /* Warm editorial palette — romantic / luxury weddings */
+    --azzurro: #B08968;        /* champagne — primary accent */
+    --azzurro-deep: #8F6B4E;
+    --azzurro-light: #FAF3ED;
+    --rosso: #8B2E3F;          /* burgundy — secondary accent */
+    --rosso-soft: #F5E9EC;
+    --verde: #7A8471;          /* sage — tertiary accent */
+    --verde-soft: #EFF1ED;
     --bianco: #FFFFFF;
-    --nero: #1A1A1A;
-    --grigio: #6B7280;
-    --grigio-light: #F3F4F6;
-    --bg: #FAFBFC;
-    --border: #E5E7EB;
+    --nero: #2A2520;           /* warm near-black text */
+    --grigio: #8A7F75;         /* warm muted text */
+    --grigio-light: #F5EFE6;   /* cream — soft surfaces */
+    --bg: #FAF7F2;             /* ivory page */
+    --border: #E8DFD4;         /* warm border */
+    --mocha: #4A3F36;          /* deep warm brown — hero */
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -33,11 +35,9 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  .flag-bar { display: flex; height: 5px; }
-  .flag-bar div { flex: 1; }
-  .flag-green { background: var(--verde); }
-  .flag-white { background: var(--bianco); border-bottom: 1px solid #eee; }
-  .flag-red { background: var(--rosso); }
+  /* Subtle champagne hairline in place of the old flag bar */
+  .flag-bar { height: 2px; background: linear-gradient(90deg, transparent 0%, var(--azzurro) 20%, var(--azzurro) 80%, transparent 100%); opacity: 0.6; }
+  .flag-bar div { display: none; }
 
   header.topbar {
     padding: 22px 28px;
@@ -333,11 +333,7 @@
 </head>
 <body>
 
-<div class="flag-bar">
-  <div class="flag-green"></div>
-  <div class="flag-white"></div>
-  <div class="flag-red"></div>
-</div>
+<div class="flag-bar"></div>
 
 <header class="topbar">
   <div>
@@ -931,29 +927,27 @@ function buildOutputHtml(s) {
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700&family=Lora:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --azzurro: #C2663A; --azzurro-deep: #A8532D; --azzurro-light: #FDF0EA;
-    --rosso: #CE2B37; --rosso-soft: #FFF0F0;
-    --verde: #008C45; --verde-soft: #EEFAF3;
-    --bianco: #FFFFFF; --nero: #1A1A1A; --grigio: #6B7280;
-    --grigio-light: #F3F4F6; --bg: #FAFBFC;
+    /* Warm editorial palette — romantic / luxury weddings */
+    --azzurro: #B08968; --azzurro-deep: #8F6B4E; --azzurro-light: #FAF3ED;
+    --rosso: #8B2E3F; --rosso-soft: #F5E9EC;
+    --verde: #7A8471; --verde-soft: #EFF1ED;
+    --bianco: #FFFFFF; --nero: #2A2520; --grigio: #8A7F75;
+    --grigio-light: #F5EFE6; --bg: #FAF7F2;
+    --border: #E8DFD4; --mocha: #4A3F36;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Lora',serif; background:var(--bg); color:var(--nero); min-height:100vh; -webkit-font-smoothing:antialiased; }
-  .flag-bar { display:flex; height:5px; }
-  .flag-bar div { flex:1; }
-  .flag-green { background:var(--verde); }
-  .flag-white { background:#fff; border-bottom:1px solid #eee; }
-  .flag-red { background:var(--rosso); }
-  .hero { background:var(--azzurro); color:#fff; padding:48px 40px 40px; }
+  .flag-bar { height:2px; background:linear-gradient(90deg, transparent 0%, var(--azzurro) 20%, var(--azzurro) 80%, transparent 100%); opacity:0.6; }
+  .flag-bar div { display:none; }
+  .hero { background:var(--mocha); color:#fff; padding:56px 40px 48px; }
   .hero-inner { max-width:800px; margin:0 auto; }
-  .hero-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; }
-  .hero-tag { font-size:11px; font-weight:600; letter-spacing:3px; text-transform:uppercase; background:rgba(255,255,255,0.15); padding:6px 14px; border-radius:100px; }
-  .hero-flag { display:flex; gap:3px; }
-  .hero-flag span { width:18px; height:26px; border-radius:3px; }
-  .hf-green { background:var(--verde); } .hf-white { background:rgba(255,255,255,0.9); } .hf-red { background:var(--rosso); }
-  .hero h1 { font-family:'Cormorant Garamond',serif; font-size:48px; font-weight:700; line-height:1.05; margin-bottom:6px; letter-spacing:-1px; }
-  .hero .location { font-family:'Cormorant Garamond',serif; font-size:20px; opacity:0.75; margin-bottom:18px; }
-  .hero .date-strip { display:inline-flex; align-items:center; gap:10px; font-size:14px; font-weight:500; background:rgba(255,255,255,0.12); padding:10px 20px; border-radius:8px; border:1px solid rgba(255,255,255,0.15); }
+  .hero-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:28px; }
+  .hero-tag { font-size:10px; font-weight:500; letter-spacing:3.5px; text-transform:uppercase; color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.22); padding:7px 14px; border-radius:100px; }
+  .hero-flag { width:32px; height:1px; background:var(--azzurro); opacity:0.9; margin-top:14px; }
+  .hero h1 { font-family:'Cormorant Garamond',serif; font-size:56px; font-weight:600; line-height:1.04; margin-bottom:10px; letter-spacing:-0.5px; }
+  .hero h1 em { font-style:italic; font-weight:400; color:var(--azzurro); }
+  .hero .location { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:19px; font-weight:400; opacity:0.75; margin-bottom:22px; }
+  .hero .date-strip { display:inline-flex; align-items:center; gap:10px; font-size:11px; font-weight:500; letter-spacing:2.5px; text-transform:uppercase; color:rgba(255,255,255,0.8); padding-top:14px; border-top:1px solid rgba(255,255,255,0.18); }
   .container { max-width:800px; margin:0 auto; padding:36px 24px 60px; }
   .section { margin-bottom:36px; }
   .section-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
@@ -1005,19 +999,17 @@ function buildOutputHtml(s) {
 </head>
 <body>
 
-<div class="flag-bar">
-  <div class="flag-green"></div><div class="flag-white"></div><div class="flag-red"></div>
-</div>
+<div class="flag-bar"></div>
 
 <div class="hero">
   <div class="hero-inner">
     <div class="hero-top">
-      <div class="hero-tag">Marco Wang Photography · Shoot Itinerary</div>
-      <div class="hero-flag">
-        <span class="hf-green"></span><span class="hf-white"></span><span class="hf-red"></span>
+      <div>
+        <div class="hero-tag">Marco Wang Photography · Shoot Itinerary</div>
+        <div class="hero-flag"></div>
       </div>
     </div>
-    <h1>${escapeHtml(s.couple.p1 || '')}${s.couple.p2 ? ' &amp;<br>' + escapeHtml(s.couple.p2) : ''}</h1>
+    <h1>${escapeHtml(s.couple.p1 || '')}${s.couple.p2 ? ' <em>&amp;</em><br>' + escapeHtml(s.couple.p2) : ''}</h1>
     ${loc ? `<div class="location">${escapeHtml(loc)}</div>` : ''}
     ${dateStr ? `<div class="date-strip"><span>${dateStr}</span></div>` : ''}
   </div>
